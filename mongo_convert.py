@@ -31,7 +31,8 @@ def refresh():
                "Used MB":row[2],
                "Free MB":row[3],
                "Total MB":row[4],
-               "Date":row[5]}
+               "% free":row[5],
+               "Date":row[6]}
         collection.insert_one(post)
     
     #Users
@@ -113,5 +114,7 @@ def refresh():
 #2 em 2 minutos
 starttime=time.time()
 while True:
+  print('Start refresh')
   refresh()
+  print('Refresh terminated')
   time.sleep(120.0 - ((time.time() - starttime) % 120.0))
