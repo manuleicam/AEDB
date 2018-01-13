@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+   <!-- Bootstrap -->
+    <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- Custom Theme Style -->
+    <link href="../build/css/custom.css" rel="stylesheet">
+
+    <title>Registo</title>
+  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/css/materialize.min.css">
+
+<style type="text/css">
+html,
+body {
+    background-image: url("../Img/c.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100%;
+     background-color: #cccccc;
+}
+html {
+    display: table;
+    margin: auto;
+}
+body {
+    display: table-cell;
+    vertical-align: middle;
+}
+.margin {
+  margin: 0 !important;
+}
+</style>
+  
+</head>
+
+<body class="blue">
+
+
+  <div id="login-page" class="row">
+    <div class="col s12 z-depth-6 card-panel">
+      <form class="login-form">
+        <div class="row">
+          <div class="input-field col s12 center">
+            
+            <p class="center login-form-text">LeSONAR - Registar</p>
+          </div>
+        </div>
+        <div class="row margin">
+          <div class="input-field col s12">
+            <i class="mdi-social-person-outline prefix"></i>
+            <input id="username" type="text" class="validate" placeholder="Username" required>
+          </div>
+        </div>
+        
+        <div class="row margin">
+          <div class="input-field col s12">
+            <i class="mdi-action-lock-outline prefix"></i>
+            <input id="password" type="password" class="validate" placeholder="Password" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <button type="button" class="btn waves-effect waves-light col s12" onClick="registarUser(document.getElementById('username').value,document.getElementById('password').value)">Registar</button>
+          <div class="input-field col s12">
+            <p class="margin center medium-small sign-up">Ir para página <a href="pag_inicial2.html">Login</a></p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+<!-- jQuery -->
+    <script src="../vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- Chart.js -->
+    <script src="../vendors/Chart.js/dist/Chart.min.js"></script>
+    <!-- Custom Theme Scripts -->
+    <script src="../build/js/custom.js"></script>
+</body>
+
+</html>

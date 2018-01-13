@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>RegistarSensor</title>
+
+    <!-- Bootstrap -->
+    <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- Custom Theme Style -->
+    <link href="../build/css/custom.css" rel="stylesheet">
+  </head>
+
+  <body class="nav-md">
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title" style="border: 0;">
+              <a class="site_title"><span>Registar</span></a>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <br />
+
+            <!-- sidebar menu -->
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <h3>Geral</h3>
+                <ul class="nav side-menu">
+                  <li><a href="perfil.html">Perfil</a></li>
+                  <li><a href="configurarPerfil.html">Configurações</a></li>
+                  <li><a href="paginaMapa.html">Sensores do Sistema</a></li>
+                  <li><a href="RegistarSensor.html"> Registar Sensor</a></li>
+                  <li><a href="alarmes.html"> Alarmes</a></li>
+                    </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- top navigation -->
+        <div class="top_nav">
+          <div class="nav_menu">
+            <nav>
+              <div class="nav toggle">
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+              </div>
+              <ul class="nav navbar-nav navbar-right">
+              <div id = "logOut">
+                    <a href="pag_inicial2.html">LogOut</a>
+                    </div>
+              </ul>
+          </div>
+        </div>
+        <!-- top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="">
+
+            <div class="page-title">
+              <div class="title_left">
+                <h3>Registar Sensor</h3>
+              </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="col-md-14 col-sm-14 col-xs-18">
+                <div class="x_content">
+                  <span class="count" ></span>
+                   <b><font size="3" id = "posX2">Insira posição X</font></b>
+                   <div><input type="text" name="posicaoX" id = "posX"><br>  </div>
+                   
+                </div>
+            </div>  
+            <div class="col-md-14 col-sm-14 col-xs-18">
+                <div class="x_content">
+                  <span class="count" ></span>
+                   <b><font size="3" id = "posY2">Insira Posição Y</font></b>
+                    <div><input type="text" name="posicaoY" id = "posY"> <br> </div>
+                </div>
+            </div>
+            <div class="col-md-14 col-sm-14 col-xs-18">
+                <div class="x_content">
+                  <span class="count" ></span>
+                   <b><font size="3" id = "detalhes22">Descrição do Local</font> </b>
+                    <div class="clearfix"></div>
+                        <input type="textarea" class="ste_box" name="desc_Local" id="detalhes" ><br> 
+
+                </div>
+            </div>    
+            <div id="ste_button">
+                <button type="button" id="button" onClick="add_Sensor(document.getElementById('posX').value,document.getElementById('posY').value,document.getElementById('detalhes').value)">Registar</button>
+            </div>
+
+            <div class="clearfix"></div>
+
+            
+
+            
+            </div>
+          </div>
+        </div>
+        <!-- page content -->
+
+        <!-- footer content -->
+        <footer>
+         </footer>
+        <!-- footer content -->
+      </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="../vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- Chart.js -->
+    <script src="../vendors/Chart.js/dist/Chart.min.js"></script>
+    <!-- Custom Theme Scripts -->
+    <script src="../build/js/custom.js"></script>
+    
+  
+  </body>
+</html>
