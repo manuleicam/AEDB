@@ -17,8 +17,11 @@ $collection = $db->session_collection;
 
 // find everything in the collection
 $cursor = $collection->aggregateCursor([
-	[ '$group' => ['_id' => '$Date', 'cpu' => ['$sum' => '$cpu_usage']]]
+	[ '$group' => ['_id' => '$Date', 'cpu' => ['$sum' => '$cpu_usage']]],
+	['$sort' => ['_id' => -1]]
 	]);
+
+
 $data = array();
 foreach ($cursor as $row) {
 	$data[] = $row;

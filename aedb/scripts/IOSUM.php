@@ -17,7 +17,8 @@ $collection = $db->IO_collection;
 
 // find everything in the collection
 $cursor = $collection->aggregateCursor([
-	[ '$group' => ['_id' => '$Date', 'writes' => ['$sum' => '$Physical_Writes'], 'reads' => ['$sum' => '$Physical_Reads'], 'blocks' => ['$sum' => '$Total_Block']]]
+	[ '$group' => ['_id' => '$Date', 'writes' => ['$sum' => '$Physical_Writes'], 'reads' => ['$sum' => '$Physical_Reads'], 'blocks' => ['$sum' => '$Total_Block']]],
+	['$sort' => ['_id' => -1]]
 	]);
 $data = array();
 foreach ($cursor as $row) {
