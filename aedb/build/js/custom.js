@@ -696,7 +696,7 @@ function lineGraphs(de, ate) {
 				}
 				var ctx = $("#IOGraph");
 
-				lineGraph = new Chart(ctx, {
+				barGraph = new Chart(ctx, {
 					type: 'line',
 					data: chartdata,
 					options: {
@@ -790,7 +790,7 @@ function lineGraphs(de, ate) {
 
 function userPage(de, ate) {
 	if ($('#IOBarUser').length) {
-
+		var myStartDate = new Date(ate - 10 * MS_PER_MINUTE);
 		userName = localStorage.getItem("user");
 		document.getElementById('userName').innerHTML = userName;
 		$.ajax({
@@ -804,7 +804,7 @@ function userPage(de, ate) {
 				var blocks = [];
 
 				for (var i in data) {
-					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
+					if (Date.parse(data[i].Date) > myStartDate && Date.parse(data[i].Date) <= ate) {
 						var res = data[i].Name.split("/");
 						if (res[7] == userName) {
 							reads.push(parseInt(data[i].Physical_Reads))
@@ -1216,6 +1216,10 @@ function destroyGraphs() {
 		lineGraph.destroy();
 	}
 	if ($('#IOBarUser').length) { //pagina utilizador
+		lineGraph.destroy();
+		barGraph.destroy();
+	}
+	if ($('#IOGraph').length) { //pagina dos 10 mins
 		lineGraph.destroy();
 		barGraph.destroy();
 	}
