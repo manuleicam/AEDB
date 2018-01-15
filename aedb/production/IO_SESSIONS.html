@@ -38,6 +38,7 @@
                 <h3>PAGINAS</h3>
                 <ul class="nav side-menu">
                   <li><a href="IO_SESSIONS.html">GRAFICOS</a></li>
+                  <li><a href="ControlLines.html">LINHAS</a></li>
                   <li><a href="BdManagement.html">TABELAS</a></li>
                   <h3>Developers:</h3>
                   <h3>Jose</h3>
@@ -70,6 +71,16 @@
               <div class="title_left">
                 <h3>Página de administração da BD</h3>
               </div>
+              <div class="col-md-6">
+                  <div class="pull-right">
+                    <select id="mySelect">
+                      <option value='1'>Hoje</option>
+                      <option value='2'>Ontem</option>
+                      <option value='5'>Ultimo mês</option>
+                      <option value='7'>Ultimo Ano</option>
+                    </select>
+                  </div>
+                </div>
             </div>
 
         <div class="clearfix"></div>
@@ -93,9 +104,41 @@
                   </div>
                 </div>
               </div>
+              
+              <div class="clearfix"></div>
+
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Cpu Usage control graph</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <canvas id='sessionLine'></canvas>
+                    <div id="js-legend3" class="chart-legend"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Wait Time control graph</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <canvas id='waitPie'></canvas>
+                    <div id="js-legend3" class="chart-legend"></div>
+                  </div>
+                </div>
+              </div>
+
               </div>
 
             <div class="clearfix"></div>
+
+            <div class="clearfix"></div>
+
+              
 
 
 
@@ -112,14 +155,24 @@
       </div>
     </div>
 
-    <!-- jQuery -->
-    <script src="../vendors/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- Chart.js -->
-    <script src="../vendors/Chart.js/dist/Chart.min.js"></script>
-    <!-- Custom Theme Scripts -->
-    <script src="../build/js/custom.js"></script>
+      <!-- jQuery -->
+  <script src="../vendors/jquery/dist/jquery.min.js"></script>
+  <!-- Bootstrap -->
+  <script src="../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+  <!-- FastClick -->
+  <script src="../vendors/fastclick/lib/fastclick.js"></script>
+  <!-- NProgress -->
+  <script src="../vendors/nprogress/nprogress.js"></script>
+  <!-- Chart.js -->
+  <script src="../vendors/Chart.js/dist/Chart.min.js"></script>
+
+  <script src="../vendors/DateJS/build/date.js"></script>
+  <!-- bootstrap-daterangepicker -->
+  <script src="../vendors/moment/min/moment.min.js"></script>
+  <script src="../vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+  <!-- Custom Theme Scripts -->
+  <script src="../build/js/custom.js"></script>
+
     
   
   </body>

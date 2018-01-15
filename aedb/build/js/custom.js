@@ -45,10 +45,10 @@ var CURRENT_URL = window.location.href.split('#')[0].split('?')[0],
 var url = "http://localhost:8888/aedb/scripts/";
 var barGraph = null, barGraph1;
 var lineGraph;
-var idCliente;
-var lastData;
-var porLer;
-var lidos;
+var user;
+var MS_PER_MINUTE = 60000;
+var ate = new Date(moment());
+var de = new Date(ate - 2 * MS_PER_MINUTE);
 
 
 // Sidebar
@@ -548,6 +548,10 @@ function init_CustomNotification() {
 
 };
 
+// relogio
+
+
+
 
 
 /* DATA TABLES */
@@ -638,282 +642,66 @@ function init_DataTables() {
 };
 
 
-
-function init_valoresLidos() {
-	var id = localStorage.getItem("idCliente");
-	if ($('#tabela').length) {
-
-		$.ajax({
-			url: url + "tabelaValores.php",
-			type: 'GET',
-			data: { id: id },
-			success: function (data) {
-				for (var i in data) {
-					$('#tabela tbody').append("<tr><td>" + data[i].valor + "</td><td>" + data[i].data + "</td><td>" + data[i].horas +
-						"</td></tr>");
-				}
-			},
-			error: function () {
-				console.log('error');
-			}
-		});
-	}
-
-	if ($('#valoresLinhas').length) {
-		$.ajax({
-			type: 'GET',
-			url: url + "valoresLinha.php",
-			data: { id: id },
-			success: function (data) {
-				var valores = [];
-				var labels = [];
-
-				for (var i in data) {
-					valores.push(parseInt(data[i].valor));
-					labels.push(data[i].data);
-				}
-
-				var chartdata = {
-					labels: labels,
-					datasets: [
-						{
-							label: "Valor leitura",
-							backgroundColor: "rgba(38, 185, 154, 0.31)",
-							borderColor: "rgba(38, 185, 154, 0.7)",
-							pointBorderColor: "rgba(38, 185, 154, 0.7)",
-							pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
-							pointHoverBackgroundColor: "#fff",
-							pointHoverBorderColor: "rgba(220,220,220,1)",
-							pointBorderWidth: 1,
-							data: valores
-						}
-					]
-				}
-				var ctx = $("#valoresLinhas");
-
-				lineGraph = new Chart(ctx, {
-					type: 'line',
-					data: chartdata,
-					options: {
-						scales: {
-							yAxes: [{
-								scaleLabel: {
-									display: true,
-									labelString: 'Valores lidos'
-								},
-								ticks: {
-									beginAtZero: true,
-
-								}
-							}],
-							xAxes: [{
-								scaleLabel: {
-									display: true,
-									labelString: "Data"
-								}
-							}]
-						}
-					}
-
-				});
-				document.getElementById('js-legend3').innerHTML = lineGraph.generateLegend();
-
-			}
-		});
-
-	}
-
-	if ($('#valoresLimite').length) {
-
-		$.ajax({
-			url: url + "tipoLeituras.php",
-			method: "GET",
-			data: { id: id },
-			success: function (data) {
-				var valores = [];
-				var label = [];
-				var sup = 0;
-				var inf = 0;
-				var normal = 0;
-
-				label.push("Valores superiores");
-				label.push("Valores inferiores");
-				label.push("Valores normais");
-
-				for (var i in data) {
-					if (parseInt(data[i].li) <= parseInt(data[i].valor) && parseInt(data[i].ls) >= parseInt(data[i].valor)) {
-						normal++;
-					}
-					else if (parseInt(data[i].li) > parseInt(data[i].valor))
-						inf++;
-					else sup++;
-				}
-
-				valores.push(sup);
-				valores.push(inf);
-				valores.push(normal);
+//document.getElementById('js-legend1').innerHTML = pieChart.generateLegend();
 
 
 
-				var colors = [
-					"#336600", "#990000", "#003366"
-				];
+function userInfo(element) {
+	var table = document.getElementById('tableSpace');
+	var userName = table.rows[element.closest('tr').rowIndex].cells[element.closest('td').cellIndex].innerHTML;
+	var res = userName.split("/");
+	console.log(res[7]);
+	//window.location='IO_SESSIONS.html'
+	localStorage.setItem("user", res[7]);
+	userPrint = localStorage.getItem("user")
+	window.location = 'userPage.html'
 
-				var chartdata = {
-					labels: label,
-					datasets: [
-						{
-							label: "Total de Acessos Negados",
-							backgroundColor: colors,
-							data: valores,
-						}
-					]
-				};
-
-				var ctx = $('#valoresLimite');
-
-				pieChart = new Chart(ctx, {
-					data: chartdata,
-					type: 'pie'
-
-				});
-				document.getElementById('js-legend1').innerHTML = pieChart.generateLegend();
-
-			},
-			error: function (data) {
-				console.log(data);
-			}
-		});
-
-	}
-
-	if ($('#nome').length) {
-
-		$.ajax({
-
-			url: url + "caractUser.php",
-			method: "GET",
-			data: { id: id },
-			success: function (data) {
-				var nome = "";
-				var li = 0;
-				var ls = 0;
-
-				for (var i in data) {
-					nome = data[i].nome;
-					li = data[i].li;
-					ls = data[i].ls;
-				}
-
-				document.getElementById('nome').innerHTML = "Nome: " + nome;
-				document.getElementById('ls').innerHTML = "Limite Superior: " + ls;
-				document.getElementById('li').innerHTML = "Limite Inferior: " + li;
-
-			}
-		})
-
-	}
 }
 
-function init_mapGraphs() {
-	if ($('#maxEmin').length) {
-
+function lineGraphs(de, ate) {
+	var myStartDate = new Date(ate - 10 * MS_PER_MINUTE);
+	if ($('#IOGraph').length) {
 		$.ajax({
-
-			url: url + "maxMin.php",
+			url: url + "IOSUM.php",
 			method: "GET",
 			data: {},
 			success: function (data) {
-				var valoresMaximos = [];
-				var valoresMinimos = [];
+				var reads = [];
+				var writes = [];
 				var labels = [];
+				var blocks = [];
 
 				for (var i in data) {
-					valoresMaximos.push(parseInt(data[i].maxs))
-					valoresMinimos.push(parseInt(data[i].mins))
-					labels.push((data[i].id))
+					if (Date.parse(data[i].Date) > myStartDate && Date.parse(data[i].Date) <= ate) {
+						reads.push(parseInt(data[i].reads))
+						writes.push(parseInt(data[i].writes))
+						blocks.push((data[i].blocks))
+						labels.push(data[i]._id)
+
+					}
 				}
 
 				var chartdata = {
 					labels: labels,
 					datasets: [
 						{
-							label: "Máximo lido",
-							backgroundColor: "rgba(300, 00, 0, 0.7)",
-							data: valoresMaximos
+							label: "Physical_Reads",
+							backgroundColor: "rgba(0, 300, 0, 0.7)",
+							data: reads
 						},
 						{
-							label: "Mínimo lido",
+							label: "Physical_Writes",
 							backgroundColor: "rgba(0, 0, 300, 0.7)",
-							data: valoresMinimos
-						}
-
-					]
-				};
-
-				var ctx = $('#maxEmin');
-
-				barGraph = new Chart(ctx, {
-					type: 'bar',
-					data: chartdata,
-					options: {
-						scales: {
-							yAxes: [{
-								scaleLabel: {
-									display: true,
-									labelString: 'Valor lido'
-								},
-								ticks: {
-									beginAtZero: true
-								}
-							}],
-							xAxes: [{
-								scaleLabel: {
-									display: true,
-									labelString: 'Id do Sensor'
-								}
-							}]
-						}
-					}
-
-				});
-				document.getElementById('js-legend2').innerHTML = barGraph.generateLegend();
-			},
-		})
-
-	}
-
-	if ($('#avgLinhas').length) {
-		$.ajax({
-			type: 'GET',
-			url: url + "avgSensores.php",
-			data: {},
-			success: function (data) {
-				var valores = [];
-				var labels = [];
-
-				for (var i in data) {
-					valores.push(parseInt(data[i].avgs));
-					labels.push(data[i].id);
-				}
-
-				var chartdata = {
-					labels: labels,
-					datasets: [
+							data: writes
+						},
 						{
-							label: "Valor Médio dos sensores",
-							backgroundColor: "rgba(38, 185, 154, 0.31)",
-							borderColor: "rgba(38, 185, 154, 0.7)",
-							pointBorderColor: "rgba(38, 185, 154, 0.7)",
-							pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
-							pointHoverBackgroundColor: "#fff",
-							pointHoverBorderColor: "rgba(220,220,220,1)",
-							pointBorderWidth: 1,
-							data: valores
+							label: "Total Block",
+							backgroundColor: "rgba(300, 00, 0, 0.7)",
+							data: blocks
 						}
 					]
 				}
-				var ctx = $("#avgLinhas");
+				var ctx = $("#IOGraph");
 
 				lineGraph = new Chart(ctx, {
 					type: 'line',
@@ -923,7 +711,7 @@ function init_mapGraphs() {
 							yAxes: [{
 								scaleLabel: {
 									display: true,
-									labelString: 'Valore Médio'
+									labelString: 'Valores'
 								},
 								ticks: {
 									beginAtZero: true,
@@ -933,171 +721,236 @@ function init_mapGraphs() {
 							xAxes: [{
 								scaleLabel: {
 									display: true,
-									labelString: "Id do Sensor"
+									labelString: "Data da Leitura"
 								}
 							}]
 						}
 					}
 
 				});
-				document.getElementById('js-legend3').innerHTML = lineGraph.generateLegend();
-
+			}, error: function (data) {
+				console.log(data);
 			}
-		});
-	}
+		})
 
-}
+		$.ajax({
+			url: url + "cpuUsageSUM.php",
+			method: "GET",
+			data: {},
+			success: function (data) {
+				var cpuUsage = [];
+				var labels = [];
 
-window.onload = function () {
-	var id = localStorage.getItem("idCliente");
-	var myLatLng = { lat: 41.56131, lng: -8.393804 };
-	var map = new google.maps.Map(document.getElementById('map'), {
-		zoom: 15,
-		center: myLatLng
-	});
+				for (var i in data) {
+					if (Date.parse(data[i].Date) > myStartDate && Date.parse(data[i].Date) <= ate) {
+						cpuUsage.push(parseFloat(data[i].cpu))
+						labels.push(data[i]._id)
 
-	$.ajax({
+					}
+				}
 
-		url: url + "localSensores.php",
-		method: "GET",
-		success: function (data) {
+				var chartdata = {
+					labels: labels,
+					datasets: [
+						{
+							label: "Physical_Reads",
+							backgroundColor: "rgba(0, 300, 0, 0.7)",
+							data: cpuUsage
+						},
 
-			for (var i in data) {
-				var titlo = "id: " + data[i].id + " detalhes: " + data[i].detalhes
-				var pointLocal = { lat: parseFloat(data[i].gpsX), lng: parseFloat(data[i].gpsY) };
-				var marker = new google.maps.Marker({
-					position: pointLocal,
-					map: map,
-					title: titlo
+					]
+				}
+				var ctx = $("#sessionGraphLine");
+
+				lineGraph = new Chart(ctx, {
+					type: 'line',
+					data: chartdata,
+					options: {
+						scales: {
+							yAxes: [{
+								scaleLabel: {
+									display: true,
+									labelString: 'Valores'
+								},
+								ticks: {
+									beginAtZero: true,
+
+								}
+							}],
+							xAxes: [{
+								scaleLabel: {
+									display: true,
+									labelString: "Data da Leitura"
+								}
+							}]
+						}
+					}
+
 				});
-
-				if (parseInt(data[i].de) == 1)
-					marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
-
+			}, error: function (data) {
+				console.log(data);
 			}
+		})
 
-
-		}
-	})
-
-
-
-
-
-	//marker.addListener('click', function() {
-	//	document.getElementById('sss').innerHTML = "DAMN"
-	//});
+	}
 }
 
-function registarUser(nome, password) {
-	var flagRegistar = 0;
-	$.ajax({
+function userPage(de, ate) {
+	if ($('#IOBarUser').length) {
 
-		url: url + "verSeNomeExiste.php",
-		method: "POST",
-		data: { nome: nome, password: password },
-		success: function (data) {
-			flagRegistar = data;
-			if (flagRegistar == "1") {
-				window.alert("O user escolhido já existe");
+		userName = localStorage.getItem("user");
+		document.getElementById('userName').innerHTML = userName;
+		$.ajax({
+			url: url + "io.php",
+			method: "GET",
+			data: {},
+			success: function (data) {
+				var reads = [];
+				var writes = [];
+				var labels = [];
+				var blocks = [];
+
+				for (var i in data) {
+					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
+						var res = data[i].Name.split("/");
+						if (res[7] == userName) {
+							reads.push(parseInt(data[i].Physical_Reads))
+							writes.push(parseInt(data[i].Physical_Writes))
+							blocks.push((data[i].Total_Block))
+							labels.push(data[i].Date)
+						}
+					}
+				}
+
+				var chartdata = {
+					labels: labels,
+					datasets: [
+						{
+							label: "Physical_Reads",
+							backgroundColor: "rgba(0, 300, 0, 0.7)",
+							data: reads
+						},
+						{
+							label: "Physical_Writes",
+							backgroundColor: "rgba(0, 0, 300, 0.7)",
+							data: writes
+						},
+						{
+							label: "Total Block",
+							backgroundColor: "rgba(300, 00, 0, 0.7)",
+							data: blocks
+						}
+					]
+				}
+				var ctx = $("#IOBarUser");
+
+				lineGraph = new Chart(ctx, {
+					type: 'line',
+					data: chartdata,
+					options: {
+						scales: {
+							yAxes: [{
+								scaleLabel: {
+									display: true,
+									labelString: 'Valores'
+								},
+								ticks: {
+									beginAtZero: true,
+
+								}
+							}],
+							xAxes: [{
+								scaleLabel: {
+									display: true,
+									labelString: "Data da Leitura"
+								}
+							}]
+						}
+					}
+
+				});
+			}, error: function (data) {
+				console.log(data);
 			}
-			else {
-				window.alert("User inserido com sucesso");
-				location.href = 'pag_inicial2.html';
+		})
+
+		$.ajax({
+			url: url + "session.php",
+			method: "GET",
+			data: {},
+			success: function (data) {
+				var cpuUsage = [];
+				var labels = [];
+
+				for (var i in data) {
+					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
+						if (data[i].Username == userName) {
+							cpuUsage.push(parseFloat(data[i].cpu_usage))
+							labels.push(data[i].Data)
+						}
+					}
+				}
+
+				var chartdata = {
+					labels: labels,
+					datasets: [
+						{
+							label: "Physical reads",
+							borderColor: "#2F4F4F",
+							pointBackgroundColor: "#2F4F4F",
+							data: cpuUsage
+						}
+					]
+				}
+				var ctx = $("#sessionLineUser");
+
+				barGraph = new Chart(ctx, {
+					type: 'line',
+					data: chartdata,
+					options: {
+						scales: {
+							yAxes: [{
+								scaleLabel: {
+									display: true,
+									labelString: 'Uso do Cpu (Segundos)'
+								},
+								ticks: {
+									beginAtZero: true,
+
+								}
+							}],
+							xAxes: [{
+								scaleLabel: {
+									display: true,
+									labelString: "Data da Leitura"
+								}
+							}]
+						}
+					}
+
+				});
+			}, error: function (data) {
+				console.log(data);
 			}
-		}
-	})
+		})
+	}
 }
 
-function logIN(nome, password) {
-	var flaglogin = 0;
-	$.ajax({
-
-		url: url + "logInUser.php",
-		method: "POST",
-		data: { nome: nome, password: password },
-		success: function (data) {
-			flaglogin = parseInt(data);
-			if (flaglogin != "-1" && flaglogin != "0") {
-				window.alert("LogIn com sucesso");
-				localStorage.setItem("idCliente", flaglogin);
-				location.href = 'paginaMapa.html';
-			}
-			if (flaglogin == "0") {
-				window.alert("Password Errada");
-			}
-			if (flaglogin == "-1") {
-				window.alert("UserName não existe");
-			}
-		}
-	})
-}
-
-function init_actualizar(inf, sup) {
-	var tipo;
-	var id = localStorage.getItem("idCliente");
-	if (inf == "" && sup == "") window.alert("Por Favor insira em pelo menos um dos campos");
-	else if (inf == "") { tipo = 1; inf = 0; }
-	else if (sup == "") { tipo = 2; sup = 0; }
-	else tipo = 3;
-	inf = parseInt(inf);
-	sup = parseInt(sup);
-	$.ajax({
-
-		url: url + "actLimites.php",
-		method: "POST",
-		data: { inf: inf, sup: sup, tipo: tipo, id: id },
-		success: function (data) {
-			if (tipo == 1)
-				window.alert("Valor máximo do sensor actualizado");
-			if (tipo == 2)
-				window.alert("Valor mínimo do sensor actualizado");
-			if (tipo == 3)
-				window.alert("Valores máximo e mínimo do sensor actualizado");
-			location.reload();
-		},
-		error: function (data) {
-			console.log(data);
-		}
-	})
-}
-
-function add_Sensor(x, y, detalhes) {
-	var emEdificio = 0;
-	var id = localStorage.getItem("idCliente");
-	if (x == "" || y == "") window.alert("Por Favor prencha os campos das posições X e Y");
-	x = parseFloat(x);
-	y = parseFloat(y);
-	if (detalhes != "") emEdificio = 1;
-	$.ajax({
-
-		url: url + "addLocalSensor.php",
-		method: "POST",
-		data: { x: x, y: y, emEdificio: emEdificio, id: id, detalhes: detalhes },
-		success: function (data) {
-			var mensagem = "Sensor instalado em " + x + "," + y;
-			window.alert(mensagem);
-			location.href = 'paginaMapa.html';
-		},
-		error: function (data) {
-			console.log(data);
-		}
-	})
-}
-
-function table_alarmes() {
+function graficosGerais(de, ate) {
 
 	if ($('#tableUser').length) {
 		$.ajax({
-
 			url: url + "users.php",
 			method: "GET",
 			data: {},
 			success: function (data) {
 				for (var i in data) {
-					$('#tableUser tbody').append("<tr><td>" + data[i].Username + "</td><td>" + data[i].Account_Status + "</td><td>" + data[i].Default_Tablespace +
-						"</td><td>" + data[i].Temporary_Tablespace + "</td><td>" + data[i].Created + "</td><td>" + data[i].Last_login + 
-						"</td><td>" + data[i].Date + "</td></tr>");
+					user = data[i].Username;
+					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
+						$('#tableUser tbody').append("<tr><td>" + data[i].Username + "</td><td>" + data[i].Account_Status + "</td><td>" + data[i].Default_Tablespace +
+							"</td><td>" + data[i].Temporary_Tablespace + "</td><td>" + data[i].Created + "</td><td>" + data[i].Last_login +
+							"</td><td>" + data[i].Date + "</td></tr>");
+					}
 				}
 			},
 			error: function (data) {
@@ -1105,6 +958,8 @@ function table_alarmes() {
 			}
 		})
 	}
+
+
 
 	if ($('#tableSpace').length) {
 		$.ajax({
@@ -1113,8 +968,10 @@ function table_alarmes() {
 			data: {},
 			success: function (data) {
 				for (var i in data) {
-					$('#tableSpace tbody').append("<tr><td>" + data[i].Tablespace + "</td><td>" + data[i].FILE_NAME + "</td><td>" + data[i].Used_MB +
-						"</td><td>" + data[i].Total_MB + "</td><td>" + data[i].Data + "</td></tr>");
+					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
+						$('#tableSpace tbody').append("<tr><td>" + data[i].Tablespace + "</td><td onclick= userInfo(this)>" + data[i].FILE_NAME + "</td><td>" + data[i].Used_MB +
+							"</td><td>" + data[i].Total_MB + "</td><td>" + data[i].Data + "</td></tr>");
+					}
 				}
 			},
 			error: function (data) {
@@ -1125,6 +982,7 @@ function table_alarmes() {
 
 	if ($('#IOBar').length) {
 
+		//de.setHours(de.getHours() - 6);
 		$.ajax({
 			url: url + "io.php",
 			method: "GET",
@@ -1136,10 +994,16 @@ function table_alarmes() {
 				var blocks = [];
 
 				for (var i in data) {
-					reads.push(parseInt(data[i].Physical_Reads))
-					writes.push(parseInt(data[i].Physical_Writes))
-					labels.push((data[i].Name))
-					blocks.push((data[i].Total_Block))
+
+					var res = data[i].Name.split("/");
+
+					var aux = new Date('2018/01/15 15:34:00')
+					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
+						reads.push(parseInt(data[i].Physical_Reads))
+						writes.push(parseInt(data[i].Physical_Writes))
+						labels.push(res[7])
+						blocks.push((data[i].Total_Block))
+					}
 				}
 
 				var chartdata = {
@@ -1147,7 +1011,7 @@ function table_alarmes() {
 					datasets: [
 						{
 							label: "Physical_Reads",
-							backgroundColor: "rgba(300, 00, 0, 0.7)",
+							backgroundColor: "rgba(0, 300, 0, 0.7)",
 							data: reads
 						},
 						{
@@ -1157,7 +1021,7 @@ function table_alarmes() {
 						},
 						{
 							label: "Total Block",
-							backgroundColor: "rgba(0, 300, 0, 0.7)",
+							backgroundColor: "rgba(300, 00, 0, 0.7)",
 							data: blocks
 						}
 
@@ -1183,7 +1047,7 @@ function table_alarmes() {
 							xAxes: [{
 								scaleLabel: {
 									display: true,
-									labelString: 'Nome do utilizador'
+									labelString: 'Data Files'
 								}
 							}]
 						}
@@ -1193,64 +1057,102 @@ function table_alarmes() {
 			},
 		})
 
+		$.ajax({
+			url: url + "wait.php",
+			method: "GET",
+			data: {},
+			success: function (data) {
+				var total = 0;
+				var flag = 0;
+				var valores = [];
+				var razao = [];
+
+				for (var i in data) {
+					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
+						if (flag < 3) {
+							razao.push(data[i].Class);
+							valores.push(parseInt(data[i].Time));
+							flag++;
+						}
+						else {
+							total = total + parseInt(data[i].Time);
+						}
+					}
+				}
+				valores.push(total);
+				razao.push("Resto");
+				var colors = [
+					"#2F4F4F", "#008080","#7f8e9e"
+				];
+
+				var chartdata = {
+					labels: razao,
+					datasets: [
+						{
+							label: "Tempo de espera",
+							backgroundColor: colors,
+							data: valores,
+						}
+					]
+				};
+
+				var ctx = $('#waitPie');
+
+				pieChartNegadosRazoes = new Chart(ctx, {
+					data: chartdata,
+					type: 'pie'
+
+				});
+			},
+			error: function (data) {
+				console.log(data);
+			}
+		});
+
 	}
 
 
 
-	if ($('#maxEmin').length) {
+	if ($('#sessionLine').length) {
 		$.ajax({
-			url: url + "io.php",
+			url: url + "session.php",
 			method: "GET",
 			data: {},
 			success: function (data) {
-				console.log(data);
-				var reads = [];
-				var writes = [];
-				var labels = [];	
+				var cpuUsage = [];
+				var labels = [];
+				var colors = [
+					"#2F4F4F", "#008080", "#2E8B57", "#3CB371", "#90EE90", "#4279a3", "#476c8a", "#49657b", "#7f8e9e"
+				];
 
 				for (var i in data) {
-					valores.push(parseInt(data[i].age));
-					labels.push(data[i].first_name);
+					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
+						cpuUsage.push(parseFloat(data[i].cpu_usage))
+						labels.push(data[i].Username)
+					}
 				}
 
 				var chartdata = {
 					labels: labels,
 					datasets: [
 						{
-							label: "Valor Médio dos sensores",
-							backgroundColor: "rgba(38, 185, 154, 0.31)",
-							borderColor: "rgba(38, 185, 154, 0.7)",
-							pointBorderColor: "rgba(38, 185, 154, 0.7)",
-							pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
-							pointHoverBackgroundColor: "#fff",
-							pointHoverBorderColor: "rgba(220,220,220,1)",
-							pointBorderWidth: 1,
-							data: valores
-						},
-						{
-							label: "Valor Médio dos sensores",
-							backgroundColor: "rgba(38, 185, 154, 0.31)",
-							borderColor: "rgba(38, 185, 154, 0.7)",
-							pointBorderColor: "rgba(38, 185, 154, 0.7)",
-							pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
-							pointHoverBackgroundColor: "#fff",
-							pointHoverBorderColor: "rgba(220,220,220,1)",
-							pointBorderWidth: 1,
-							data: valores
+							label: "Tempo de uso do cpu da session",
+							backgroundColor: "rgba(0, 300, 0, 0.7)",
+							data: cpuUsage
 						}
 					]
 				}
-				var ctx = $("#maxEmin");
+				var ctx = $("#sessionLine");
 
 				lineGraph = new Chart(ctx, {
-					type: 'line',
+					type: 'bar',
 					data: chartdata,
 					options: {
 						scales: {
 							yAxes: [{
 								scaleLabel: {
 									display: true,
-									labelString: 'Valore Médio'
+									labelString: 'cpu usado (segundos)'
 								},
 								ticks: {
 									beginAtZero: true,
@@ -1260,15 +1162,13 @@ function table_alarmes() {
 							xAxes: [{
 								scaleLabel: {
 									display: true,
-									labelString: "Id do Sensor"
+									labelString: "Nome da sessão"
 								}
 							}]
 						}
 					}
 
 				});
-
-				//document.getElementById('nome').innerHTML = data;
 			}, error: function (data) {
 				console.log(data);
 			}
@@ -1276,145 +1176,65 @@ function table_alarmes() {
 	}
 }
 
+function changeData(value) {
 
-/*function table_alarmes(){
-	if ($('#tabelaAlertas').length ){
-	var nporLer = parseInt(localStorage.getItem("porLer"));
-	var jaLidos = parseInt(localStorage.getItem("lidos"));
-	if (isNaN(jaLidos)) jaLidos = 0;
-	var auxReg = 0;
-	var reg = 0;
-	$.ajax({
-
-		url: url + "alarmes.php",
-		method: "GET",
-		data: {},
-		success: function(data) {
-			
-			for(var i in data){
-				if(parseInt(data[i].valor) < parseInt(data[i].li)){
-					$('#tabelaAlertas tbody').append("<tr><td>" + data[i].nome + "</td><td>" + data[i].valor + "</td><td>" + "Limite Inferior: " + data[i].li +
-							"</td><td>" + data[i].dia + "</td><td>" + data[i].horas + "</td></tr>" );		
-				}
-				else{
-					$('#tabelaAlertas tbody').append("<tr><td>" + data[i].nome + "</td><td>" + data[i].valor + "</td><td>" + "Limite Superior: " + data[i].ls +
-							"</td><td>" + data[i].dia + "</td><td>" + data[i].horas + "</td></tr>" );
-				}
-				reg++;
-			}
-			auxReg = reg - jaLidos;
-			reg =  auxReg + jaLidos;
-			localStorage.setItem("lidos", reg);
-		},
-		error : function(data){
-			console.log(data);
-		}
-	})
-}	
-}*/
-
-function init_alarmes() {
-	var nporLer = parseInt(localStorage.getItem("porLer"));
-	var jaLidos = parseInt(localStorage.getItem("lidos"));
-	if (isNaN(jaLidos)) jaLidos = 0;
-	var reg = 0;
-	$.ajax({
-
-		url: url + "alarmes.php",
-		method: "GET",
-		data: {},
-		success: function (data) {
-
-			for (var i in data) {
-				reg++;
-			}
-			nporLer = reg - jaLidos;
-			if (nporLer != 0) {
-				var mensagem = "Existem " + nporLer + " irregularidades que deviam ser vistas";
-				window.alert(mensagem);
-			}
-		},
-		error: function (data) {
-			console.log(data);
-		}
-	})
+	switch (value) {
+		case "1":
+			de = new Date(moment().startOf('day'));
+			ate = new Date(moment());
+			var myStartDate = new Date(ate - 2 * MS_PER_MINUTE);
+			break;
+		case "2":
+			de = new Date(moment().subtract(1, 'days').startOf('day'));
+			ate = new Date(moment().subtract(1, 'days').endOf('day'));
+			var myStartDate = new Date(ate - 2 * MS_PER_MINUTE);
+			break;
+		case "5":
+			de = new Date(moment().subtract(1, 'month').startOf('month'));
+			ate = new Date(moment().subtract(1, 'month').endOf('month'));
+			var myStartDate = new Date(ate - 2 * MS_PER_MINUTE);
+			break;
+		case "7":
+			de = new Date(moment().subtract(1, 'year').startOf('year'));
+			ate = new Date(moment().subtract(1, 'year').endOf('year'));
+			var myStartDate = new Date(ate - 2 * MS_PER_MINUTE);
+			break;
+	}
+	initGraphs(myStartDate, ate);
 }
 
-function valoresSensores() {
-	if ($('#valoresAtuais').length) {
-		$.ajax({
-			type: 'GET',
-			url: url + "valoresAtuais.php",
-			data: {},
-			success: function (data) {
-				var valores = [];
-				var labels = [];
 
-				for (var i in data) {
-					valores.push(parseInt(data[i].valor));
-					labels.push(data[i].id);
-				}
+$('#mySelect').on('change', function () {
+	var value = $(this).val();
+	changeData(value);
+});
 
-				var chartdata = {
-					labels: labels,
-					datasets: [
-						{
-							label: "Valor Médio dos sensores",
-							backgroundColor: "rgba(38, 185, 154, 0.31)",
-							borderColor: "rgba(38, 185, 154, 0.7)",
-							pointBorderColor: "rgba(38, 185, 154, 0.7)",
-							pointBackgroundColor: "rgba(38, 185, 154, 0.7)",
-							pointHoverBackgroundColor: "#fff",
-							pointHoverBorderColor: "rgba(220,220,220,1)",
-							pointBorderWidth: 1,
-							data: valores
-						}
-					]
-				}
-				var ctx = $("#avgLinhas");
-
-				lineGraph = new Chart(ctx, {
-					type: 'line',
-					data: chartdata,
-					options: {
-						scales: {
-							yAxes: [{
-								scaleLabel: {
-									display: true,
-									labelString: 'Valore Médio'
-								},
-								ticks: {
-									beginAtZero: true,
-
-								}
-							}],
-							xAxes: [{
-								scaleLabel: {
-									display: true,
-									labelString: "Id do Sensor"
-								}
-							}]
-						}
-					}
-
-				});
-				document.getElementById('js-legend1').innerHTML = lineGraph.generateLegend();
-
-			}
-		});
+function destroyGraphs() {
+	if ($('#tableUser').length) { //pagina das tabelas
+		$("#tableUser  tbody tr").remove();
+		$("#tableSpace  tbody tr").remove();
+	}
+	if ($('#IOBar').length) { //pagina dos gráficos
+		barGraph.destroy();
+		lineGraph.destroy();
+	}
+	if ($('#IOBarUser').length) { //pagina utilizador
+		lineGraph.destroy();
+		barGraph.destroy();
 	}
 }
 
-
-
-
-
-
-
+function initGraphs(de, ate) {
+	destroyGraphs();
+	//graficosGerais(de,ate);
+	//userPage(de, ate);
+}
 
 
 $(document).ready(function () {
-	table_alarmes();
+	graficosGerais(de, ate);
+	userPage(de, ate);
+	lineGraphs(de, ate)
 
 	init_sidebar();
 	init_InputMask();

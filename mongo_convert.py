@@ -6,6 +6,7 @@ Created on Sun Jan  7 15:09:08 2018
 """
 from pymongo import MongoClient
 import cx_Oracle
+from datetime import datetime
 import time
 
 def refresh():
@@ -28,11 +29,11 @@ def refresh():
     for row in c:
         post= {"FILE_NAME": row[0],
                "Tablespace":row[1],
-               "Used MB":row[2],
-               "Free MB":row[3],
-               "Total MB":row[4],
-               "% free":row[5],
-               "Date":row[6]}
+               "Used_MB":row[2],
+               "Free_MB":row[3],
+               "Total_MB":row[4],
+               "Free_PerCent":row[5],
+               "Date":str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))}
         collection.insert_one(post)
     
     #Users
@@ -48,7 +49,7 @@ def refresh():
                "Temporary_Tablespace":row[3],
                "Created":row[4],
                "Last_login":row[5],
-               "Date":row[6]}
+               "Date":str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))}
         collection.insert_one(post)
     
     #Session
@@ -61,8 +62,8 @@ def refresh():
         post= {"Username": row[0],
                "SID":row[1],
                "Serial":row[2],
-               "cpu usage (seconds)":row[3],
-               "Date":row[4]}
+               "cpu_usage":row[3],
+               "Date":str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))}
         collection.insert_one(post)
     
     #IO
@@ -76,12 +77,12 @@ def refresh():
     post={}
     for row in c:
         post= {"Name": row[0],
-               "Physical Reads":row[1],
-               "Read %":row[2],
-               "Physical Writes":row[3],
-               "Write %":row[4],
-               "Total Block I/O\'s":row[5],
-               "Date":row[6]}
+               "Physical_Reads":row[1],
+               "Read_PerCent":row[2],
+               "Physical_Writes":row[3],
+               "Write_PerCent":row[4],
+               "Total_Block":row[5],
+               "Date":str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))}
         collection.insert_one(post)
     
     #Stat
@@ -95,7 +96,7 @@ def refresh():
                "Name":row[1],
                "Class":row[2],
                "Value":row[3],
-               "Date":row[4]}
+               "Date":str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))}
         collection.insert_one(post)
         
     #Waits
@@ -108,7 +109,7 @@ def refresh():
         post= {"Class": row[0],
                "Count":row[1],
                "Time":row[2],
-               "Date":row[3]}
+               "Date":str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))}
         collection.insert_one(post)
 
 #2 em 2 minutos

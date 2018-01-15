@@ -1,0 +1,11 @@
+session:
+
+sid serial n importa
+
+--
+
+stat:
+
+wait:
+
+fazer os que têm mais espera e somar o total
