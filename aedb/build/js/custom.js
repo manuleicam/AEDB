@@ -200,17 +200,7 @@ $(document).ready(function () {
 // /Switchery
 
 
-// iCheck
-$(document).ready(function () {
-	if ($("input.flat")[0]) {
-		$(document).ready(function () {
-			$('input.flat').iCheck({
-				checkboxClass: 'icheckbox_flat-green',
-				radioClass: 'iradio_flat-green'
-			});
-		});
-	}
-});
+
 // /iCheck
 
 // Table
@@ -659,8 +649,12 @@ function userInfo(element) {
 }
 
 function lineGraphs(de, ate) {
-	var myStartDate = new Date(ate - 10 * MS_PER_MINUTE);
+	var ate2 = new Date(moment());
+	var myStartDate = new Date(ate2 - 10 * MS_PER_MINUTE);
+	
 	if ($('#IOGraph').length) {
+		console.log(myStartDate)
+		console.log(ate2);
 		$.ajax({
 			url: url + "IOSUM.php",
 			method: "GET",
@@ -672,12 +666,11 @@ function lineGraphs(de, ate) {
 				var blocks = [];
 
 				for (var i in data) {
-					if (Date.parse(data[i].Date) > myStartDate && Date.parse(data[i].Date) <= ate) {
+					if (Date.parse(data[i]._id) > myStartDate && Date.parse(data[i]._id) <= ate2) {
 						reads.push(parseInt(data[i].reads))
 						writes.push(parseInt(data[i].writes))
 						blocks.push((data[i].blocks))
 						labels.push(data[i]._id)
-
 					}
 				}
 
@@ -742,7 +735,7 @@ function lineGraphs(de, ate) {
 				var labels = [];
 
 				for (var i in data) {
-					if (Date.parse(data[i].Date) > myStartDate && Date.parse(data[i].Date) <= ate) {
+					if (Date.parse(data[i]._id) > myStartDate && Date.parse(data[i]._id) <= ate2) {
 						cpuUsage.push(parseFloat(data[i].cpu))
 						labels.push(data[i]._id)
 
@@ -753,7 +746,7 @@ function lineGraphs(de, ate) {
 					labels: labels,
 					datasets: [
 						{
-							label: "Physical_Reads",
+							label: "Tempo de cpu gasto",
 							backgroundColor: "rgba(0, 300, 0, 0.7)",
 							data: cpuUsage
 						},
@@ -770,7 +763,7 @@ function lineGraphs(de, ate) {
 							yAxes: [{
 								scaleLabel: {
 									display: true,
-									labelString: 'Valores'
+									labelString: 'Cpu time (seconds)'
 								},
 								ticks: {
 									beginAtZero: true,
@@ -945,10 +938,13 @@ function graficosGerais(de, ate) {
 			data: {},
 			success: function (data) {
 				for (var i in data) {
-					user = data[i].Username;
+
+					var date = new Date(data[i].Created.sec);
+					if (data[i].Last_login!= null)var log = new Date(data[i].Last_login.sec)
+					else var log = null;
 					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
 						$('#tableUser tbody').append("<tr><td>" + data[i].Username + "</td><td>" + data[i].Account_Status + "</td><td>" + data[i].Default_Tablespace +
-							"</td><td>" + data[i].Temporary_Tablespace + "</td><td>" + data[i].Created + "</td><td>" + data[i].Last_login +
+							"</td><td>" + data[i].Temporary_Tablespace + "</td><td>" + date + "</td><td>" + log +
 							"</td><td>" + data[i].Date + "</td></tr>");
 					}
 				}
@@ -968,9 +964,10 @@ function graficosGerais(de, ate) {
 			data: {},
 			success: function (data) {
 				for (var i in data) {
+					
 					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
 						$('#tableSpace tbody').append("<tr><td>" + data[i].Tablespace + "</td><td onclick= userInfo(this)>" + data[i].FILE_NAME + "</td><td>" + data[i].Used_MB +
-							"</td><td>" + data[i].Total_MB + "</td><td>" + data[i].Data + "</td></tr>");
+							"</td><td>" + data[i].Total_MB + "</td><td>" + data[i].Date + "</td></tr>");
 					}
 				}
 			},
@@ -1226,15 +1223,19 @@ function destroyGraphs() {
 
 function initGraphs(de, ate) {
 	destroyGraphs();
-	//graficosGerais(de,ate);
-	//userPage(de, ate);
+	graficosGerais(de,ate);
+	userPage(de, ate);
+}
+
+function init_all(de, ate){
+	graficosGerais(de, ate);
+	userPage(de, ate);
+	lineGraphs(de, ate)
 }
 
 
 $(document).ready(function () {
-	graficosGerais(de, ate);
-	userPage(de, ate);
-	lineGraphs(de, ate)
+	init_all(de, ate);
 
 	init_sidebar();
 	init_InputMask();
