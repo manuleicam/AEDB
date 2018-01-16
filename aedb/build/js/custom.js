@@ -651,7 +651,7 @@ function userInfo(element) {
 function lineGraphs(de, ate) {
 	var ate2 = new Date(moment());
 	var myStartDate = new Date(ate2 - 10 * MS_PER_MINUTE);
-	
+
 	if ($('#IOGraph').length) {
 		console.log(myStartDate)
 		console.log(ate2);
@@ -940,7 +940,7 @@ function graficosGerais(de, ate) {
 				for (var i in data) {
 
 					var date = new Date(data[i].Created.sec);
-					if (data[i].Last_login!= null)var log = new Date(data[i].Last_login.sec)
+					if (data[i].Last_login != null) var log = new Date(data[i].Last_login.sec)
 					else var log = null;
 					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
 						$('#tableUser tbody').append("<tr><td>" + data[i].Username + "</td><td>" + data[i].Account_Status + "</td><td>" + data[i].Default_Tablespace +
@@ -964,7 +964,7 @@ function graficosGerais(de, ate) {
 			data: {},
 			success: function (data) {
 				for (var i in data) {
-					
+
 					if (Date.parse(data[i].Date) > de && Date.parse(data[i].Date) <= ate) {
 						$('#tableSpace tbody').append("<tr><td>" + data[i].Tablespace + "</td><td onclick= userInfo(this)>" + data[i].FILE_NAME + "</td><td>" + data[i].Used_MB +
 							"</td><td>" + data[i].Total_MB + "</td><td>" + data[i].Date + "</td></tr>");
@@ -1079,7 +1079,7 @@ function graficosGerais(de, ate) {
 				valores.push(total);
 				razao.push("Resto");
 				var colors = [
-					"#2F4F4F", "#008080","#7f8e9e"
+					"#2F4F4F", "#008080", "#7f8e9e"
 				];
 
 				var chartdata = {
@@ -1212,26 +1212,33 @@ function destroyGraphs() {
 		$("#tableSpace  tbody tr").remove();
 	}
 	if ($('#IOBar').length) { //pagina dos gráficos
-		barGraph.destroy();
-		lineGraph.destroy();
+		if (barGraph != null) {
+			barGraph.destroy();
+			lineGraph.destroy();
+		}
 	}
 	if ($('#IOBarUser').length) { //pagina utilizador
-		lineGraph.destroy();
-		barGraph.destroy();
+		if (barGraph != null) {
+			lineGraph.destroy();
+			barGraph.destroy();
+		}
 	}
 	if ($('#IOGraph').length) { //pagina dos 10 mins
-		lineGraph.destroy();
-		barGraph.destroy();
+		if (barGraph != null) {
+			lineGraph.destroy();
+			barGraph.destroy();
+		}
 	}
 }
 
 function initGraphs(de, ate) {
 	destroyGraphs();
-	graficosGerais(de,ate);
+	graficosGerais(de, ate);
 	userPage(de, ate);
+	lineGraphs(de, ate)
 }
 
-function init_all(de, ate){
+function init_all(de, ate) {
 	graficosGerais(de, ate);
 	userPage(de, ate);
 	lineGraphs(de, ate)
@@ -1239,7 +1246,11 @@ function init_all(de, ate){
 
 
 $(document).ready(function () {
-	init_all(de, ate);
+	init_all(de, ate)
+	setInterval(function () {
+		initGraphs(de, ate);
+	}, 20000);
+
 
 	init_sidebar();
 	init_InputMask();

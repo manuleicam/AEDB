@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Jan  7 15:09:08 2018
 
-@author: DreadClown
-"""
 from pymongo import MongoClient
 import cx_Oracle
 from datetime import datetime
